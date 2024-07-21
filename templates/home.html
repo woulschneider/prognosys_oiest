@@ -1,20 +1,12 @@
-<!DOCTYPE html>
-{% load static %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <script src="{% static 'js/main.js' %}", defer></script>
-    <title>Supernova26</title>
-</head>
-<body>
-    <nav></nav>
-    <main>
-        <div>
-            <h1>ola mundo</h1>
-        </div>
-    </main>
-    <footer></footer>
-</body>
-</html>
+{% extends "layout.html" %}
+
+{% block title %}
+  Prognosys - Tecnologia Médica
+{% endblock title %}
+
+{% block content %}
+  <h1>olá mundo</h1>
+{% endblock content %}
+
+
+

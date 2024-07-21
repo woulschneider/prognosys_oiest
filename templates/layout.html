@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock extra_css %}
+    {% block extra_js %}{% endblock extra_js %}
+    <script src="{% static 'js/main.js' %}", defer></script>
+    <title>
+        {% block title %}
+          Supernova26 - Tecnologia Médica
+        {% endblock title %}
+
+    </title>
+</head>
+<body>
+    <nav>
+        <h3>supernova26<h3>  
+        <div class="nav-links">
+            <a href="/">home</a> | 
+            <a href="/login">login</a> | 
+        </div>
+    </nav>
+    <main>
+        {% block content %}
+        {% endblock content %}
+    </main>
+    <footer></footer>
+</body>
+</html>

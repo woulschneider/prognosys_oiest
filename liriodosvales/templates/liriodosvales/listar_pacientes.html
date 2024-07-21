@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'liriodosvales/css/lista.css' %}">
+{% endblock extra_css %}
+
+
+{% block title %}
+    Lírio dos Vales - Pacientes
+{% endblock title %}
+
+{% block content %}
+<main>
+   
+    <section>
+        <h2>Nomes dos Pacientes</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Data de Admissão</th>
+                    <th>Nome</th>
+                    <th>CPF</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for paciente in pacientes %}
+                <tr>
+                    <td>{{ paciente.data_admissao|date:"d/m/Y" }}</td>
+                    <td>{{ paciente.nome }}</td>
+                    <td>{{ paciente.cpf }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+    <a href="{% url 'home' %}">Voltar à pagina principal</a>
+</main>
+    
+{% endblock content %}

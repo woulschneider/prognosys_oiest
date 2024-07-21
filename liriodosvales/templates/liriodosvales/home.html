@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'liriodosvales/css/style.css' %}">
+{% endblock extra_css %}
+
+
+{% block title %}
+  Lírio dos Vales - Casa de Repouso
+{% endblock title %}
+
+{% block content %}
+<main>
+    <h1>Casa de Repouso Lírio dos Vales</h1>
+    <h2>Seja bem vindo! O que deseja fazer?</h2>
+    <p>
+        <a href="{% url 'listar_pacientes' %}">Listar Pacientes</a> | 
+        <a href=" {% url 'novo_paciente' %} ">Cadastrar Novo Paciente</a>
+
+</main>
+{% endblock content %}
+  
