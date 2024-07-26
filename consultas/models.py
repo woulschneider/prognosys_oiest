@@ -20,3 +20,6 @@ class Atendimento(models.Model):
 
     def __str__(self):
         return f'{self.nome_paciente} - {self.data_consulta}'
+
+    class Meta:
+        db_table = 'consultas_atendimento'

@@ -8,17 +8,49 @@
     <button type="submit">Registrar</button>
   </form>
 
-  <h2>Atendimentos de Hoje</h2>
-  <ul>
-    {% for atendimento in atendimentos_hoje %}
-      <li>{{ atendimento.nome_paciente }} - {{ atendimento.data_consulta }} - {{ atendimento.get_tipo_atendimento_display }} - {{ atendimento.cid }}</li>
-    {% endfor %}
-  </ul>
+  <h2>Atendimentos {{ data_atual }}</h2>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Data do Atendimento</th>
+        <th>Nome do Paciente</th>
+        <th>CID</th>
+        <th>Tipo de Atendimento</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for atendimento in atendimentos_hoje %}
+        <tr>
+          <td>{{ atendimento.data_consulta|date:"d/m/Y" }}</td>
+          <td>{{ atendimento.nome_paciente }}</td>
+          <td>{{ atendimento.cid }}</td>
+          <td>{{ atendimento.get_tipo_atendimento_display }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <a href="{% url 'consultas:imprimir_atendimentos' %}" target="_blank">Imprimir Atendimentos</a>
 
   <h2>Atendimentos Anteriores</h2>
-  <ul>
-    {% for atendimento in atendimentos_anteriores %}
-      <li>{{ atendimento.nome_paciente }} - {{ atendimento.data_consulta }} - {{ atendimento.get_tipo_atendimento_display }} - {{ atendimento.cid }}</li>
-    {% endfor %}
-  </ul>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Data do Atendimento</th>
+        <th>Nome do Paciente</th>
+        <th>CID</th>
+        <th>Tipo de Atendimento</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for atendimento in atendimentos_anteriores %}
+        <tr>
+          <td>{{ atendimento.data_consulta|date:"d/m/Y" }}</td>
+          <td>{{ atendimento.nome_paciente }}</td>
+          <td>{{ atendimento.cid }}</td>
+          <td>{{ atendimento.get_tipo_atendimento_display }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 {% endblock %}
