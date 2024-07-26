@@ -21,14 +21,16 @@
     Lírio dos Vales - Novo Paciente
 {% endblock title %}
 {% block content %}
-    <section>
-        <h1>Cadastrar Novo Paciente</h1>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Cadastrar</button>
-        </form>
-        <a href="{% url 'listar_pacientes' %}">Voltar para lista de pacientes</a>
-    </section>
+    <main>
+        <section>
+            <h1>Cadastrar Novo Paciente</h1>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Cadastrar</button>
+            </form>
+            <a href="{% url 'liriodosvales:listar_pacientes' %}">Voltar para lista de pacientes</a>
+        </section>
+    </main>
 {% endblock content %}
 

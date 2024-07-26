@@ -1,106 +1,78 @@
-/* Estilos para o formulário de cadastro de pacientes */
-body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    color: #333;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f4f4f4;
-}
+/* app.css */
+
+/* Estilo do conteúdo principal */
 main {
-    margin-top: 70px;
-}
-
-h1 {
-    color: #2c3e50;
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-form {
-    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
     padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin-top: 70px; /* Ajuste este valor para a altura da sua navbar */
 }
 
-label {
+/* Estilo das seções */
+section {
+    width: 100%;  /* Definindo a largura para 100% */
+    max-width: 800px;  /* Definindo uma largura máxima */
+    min-width: 800px;  /* Definindo uma largura mínima */
+    margin: 0 auto;  /* Centraliza a seção */
+    padding: 20px;
+    background-color: #ffffff;  /* Cor de fundo para destacar o formulário */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Sombra para um efeito de elevação */
+    border-radius: 8px;  /* Bordas arredondadas para uma aparência mais suave */
+}
+
+/* Estilo dos campos do formulário */
+form label {
     display: block;
-    margin-bottom: 5px;
+    margin-top: 10px;
     font-weight: bold;
 }
 
-input[type="text"],
-input[type="date"],
-select,
-textarea {
+form input, form select, form textarea {
     width: 100%;
-    padding: 8px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
 }
 
-select {
-    height: 35px;
-}
-
-button[type="submit"] {
-    background-color: #3498db;
-    color: #fff;
-    padding: 10px 15px;
+/* Botão de enviar */
+form button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 16px;
 }
 
-button[type="submit"]:hover {
-    background-color: #2980b9;
+form button:hover {
+    background-color: #0056b3;
 }
 
-a {
-    display: inline-block;
+/* Estilo da tabela */
+table {
+    width: 80%;
+    max-width: 1200px;
+    border-collapse: collapse;
     margin-top: 20px;
-    color: #3498db;
-    text-decoration: none;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-a:hover {
-    text-decoration: underline;
-}
-.paciente-form {
-    max-width: 800px; /* Aumentado para maior largura */
-    width: 90%;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
-.paciente-form input[type="text"],
-.paciente-form input[type="date"],
-.paciente-form input[type="email"],
-.paciente-form select,
-.paciente-form textarea {
-    width: 100%;
+table th, table td {
     padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
+    text-align: left;
+    border: 1px solid #dddddd;
 }
 
-.paciente-form label {
-    font-size: 16px;
-    margin-bottom: 5px;
-    display: block;
+table tr:nth-child(odd) {
+    background-color: #f9f9f9;
 }
 
-.paciente-form button[type="submit"] {
-    font-size: 18px;
-    padding: 12px 20px;
+table tr:nth-child(even) {
+    background-color: #eeeeee;
 }

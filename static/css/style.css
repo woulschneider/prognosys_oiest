@@ -1,11 +1,24 @@
+/* project.css */
 
-
-
-
-h1, p {
-    text-align: center;
+/* Estilo geral do corpo */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
 }
 
+/* Estilo do conteúdo principal */
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px;
+    margin-top: 70px; /* Ajuste este valor para a altura da sua navbar */
+}
+
+/* Estilo da navbar */
 nav {
     display: flex;
     justify-content: space-between;
@@ -17,28 +30,34 @@ nav {
     top: 0;
     left: 0;
     width: 100%;
+    height: 50px; /* Defina uma altura fixa para a navbar */
     z-index: 1000; /* Garante que a navbar fique acima do conteúdo */
-}
-nav h3 {
-    margin: 0;
-    margin-right: 20px;
-    font-size: 1.5rem;
+    box-sizing: border-box;
 }
 
-nav a {
-    margin-right: 15px;
+nav h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #fffefe; /* Ajustando a cor do texto, se necessário */
+}
+
+nav .nav-links {
+    display: flex;
+    align-items: center;
+}
+
+nav .nav-links a {
+    margin-left: 15px;
     text-decoration: none;
     color: #007bff;
     font-size: 1rem;
 }
 
-nav a:hover {
+nav .nav-links a:hover {
     text-decoration: underline;
 }
 
-nav a:last-child {
+/* Garantir que o último item não seja cortado */
+nav .nav-links a:last-child {
     margin-right: 0;
 }
-
-
-
