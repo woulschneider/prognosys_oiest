@@ -1,0 +1,78 @@
+/* app.css */
+
+/* Estilo do conteúdo principal */
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px;
+    margin-top: 70px; /* Ajuste este valor para a altura da sua navbar */
+}
+
+/* Estilo das seções */
+section {
+    width: 100%;  /* Definindo a largura para 100% */
+    max-width: 800px;  /* Definindo uma largura máxima */
+    min-width: 800px;  /* Definindo uma largura mínima */
+    margin: 0 auto;  /* Centraliza a seção */
+    padding: 20px;
+    background-color: #ffffff;  /* Cor de fundo para destacar o formulário */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Sombra para um efeito de elevação */
+    border-radius: 8px;  /* Bordas arredondadas para uma aparência mais suave */
+}
+
+/* Estilo dos campos do formulário */
+form label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+form input, form select, form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Botão de enviar */
+form button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #0056b3;
+}
+
+/* Estilo da tabela */
+table {
+    width: 80%;
+    max-width: 1200px;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+table th, table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #dddddd;
+}
+
+table tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+table tr:nth-child(even) {
+    background-color: #eeeeee;
+}
