@@ -2,10 +2,11 @@ from django.db import models
 
 class Medicacao(models.Model):
     nome = models.CharField(max_length=100)
-    dosagem = models.CharField(max_length=50)
+    dosagem = models.CharField(max_length=100)
+    posologia = models.TextField() 
 
     def __str__(self):
-        return self.nome
+        return f"{self.nome} - {self.dosagem} - {self.posologia}"
     
 class Alergia(models.Model):
     nome = models.CharField(max_length=100)

@@ -14,70 +14,128 @@ from .forms import PacienteForm
 from .models import Paciente, Medicacao, Alergia, Diagnostico
 
 def novo_paciente(request):
+    medicacoes = []
+    alergias = []
+    diagnosticos = []
+
     if request.method == 'POST':
         form = PacienteForm(request.POST)
         if form.is_valid():
             paciente = form.save(commit=False)
             paciente.save()
-            # Adicionando nova medicação
-            nova_medicacao_nome = form.cleaned_data.get('nova_medicacao_nome')
-            nova_medicacao_dosagem = form.cleaned_data.get('nova_medicacao_dosagem')
-            if nova_medicacao_nome and nova_medicacao_dosagem:
-                medicacao = Medicacao(nome=nova_medicacao_nome, dosagem=nova_medicacao_dosagem)
-                medicacao.save()
-                paciente.medicacoes.add(medicacao)
-            # Adicionando nova alergia
-            nova_alergia_nome = form.cleaned_data.get('nova_alergia_nome')
-            nova_alergia_tipo = form.cleaned_data.get('nova_alergia_tipo')
-            if nova_alergia_nome:
-                alergia = Alergia(nome=nova_alergia_nome, tipo=nova_alergia_tipo)
-                alergia.save()
-                paciente.alergias.add(alergia)
-            # Adicionando novo diagnóstico
-            novo_diagnostico_nome = form.cleaned_data.get('novo_diagnostico_nome')
-            novo_diagnostico_codigo_cid = form.cleaned_data.get('novo_diagnostico_codigo_cid')
-            if novo_diagnostico_nome:
-                diagnostico = Diagnostico(nome=novo_diagnostico_nome, codigo_cid=novo_diagnostico_codigo_cid)
-                diagnostico.save()
-                paciente.diagnosticos.add(diagnostico)
+
+            # Processar e salvar medicações
+            medicacao_nomes = request.POST.getlist('medicacoes_nomes[]')
+            medicacao_dosagens = request.POST.getlist('medicacoes_dosagens[]')
+            medicacao_posologias = request.POST.getlist('medicacoes_posologias[]')
+            for nome, dosagem, posologia in zip(medicacao_nomes, medicacao_dosagens, medicacao_posologias):
+                if nome and dosagem and posologia:
+                    medicacao = Medicacao(nome=nome, dosagem=dosagem, posologia=posologia)
+                    medicacao.save()
+                    paciente.medicacoes.add(medicacao)
+
+            # Processar e salvar alergias
+            alergia_nomes = request.POST.getlist('alergias_nomes[]')
+            for nome in alergia_nomes:
+                if nome:
+                    alergia = Alergia(nome=nome)
+                    alergia.save()
+                    paciente.alergias.add(alergia)
+
+            # Processar e salvar diagnósticos
+            diagnostico_nomes = request.POST.getlist('diagnosticos_nomes[]')
+            diagnostico_codigos_cid = request.POST.getlist('diagnosticos_codigos_cid[]')
+            for nome, codigo_cid in zip(diagnostico_nomes, diagnostico_codigos_cid):
+                if nome and codigo_cid:
+                    diagnostico = Diagnostico(nome=nome, codigo_cid=codigo_cid)
+                    diagnostico.save()
+                    paciente.diagnosticos.add(diagnostico)
+
             return redirect('liriodosvales:editar_paciente', paciente_id=paciente.id)
+        else:
+            # Preservar os dados inseridos nas listas
+            medicacoes = zip(request.POST.getlist('medicacoes_nomes[]'), 
+                             request.POST.getlist('medicacoes_dosagens[]'), 
+                             request.POST.getlist('medicacoes_posologias[]'))
+            alergias = request.POST.getlist('alergias_nomes[]')
+            diagnosticos = zip(request.POST.getlist('diagnosticos_nomes[]'), 
+                               request.POST.getlist('diagnosticos_codigos_cid[]'))
     else:
         form = PacienteForm()
-    return render(request, 'liriodosvales/novo_paciente.html', {'form': form})
+
+    return render(request, 'liriodosvales/novo_paciente.html', {
+        'form': form,
+        'medicacoes': medicacoes,
+        'alergias': alergias,
+        'diagnosticos': diagnosticos
+    })
 
 def editar_paciente(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
+
     if request.method == 'POST':
         form = PacienteForm(request.POST, instance=paciente)
         if form.is_valid():
             paciente = form.save(commit=False)
             paciente.save()
-            # Adicionando nova medicação
-            nova_medicacao_nome = form.cleaned_data.get('nova_medicacao_nome')
-            nova_medicacao_dosagem = form.cleaned_data.get('nova_medicacao_dosagem')
-            if nova_medicacao_nome and nova_medicacao_dosagem:
-                medicacao = Medicacao(nome=nova_medicacao_nome, dosagem=nova_medicacao_dosagem)
-                medicacao.save()
-                paciente.medicacoes.add(medicacao)
-            # Adicionando nova alergia
-            nova_alergia_nome = form.cleaned_data.get('nova_alergia_nome')
-            nova_alergia_tipo = form.cleaned_data.get('nova_alergia_tipo')
-            if nova_alergia_nome:
-                alergia = Alergia(nome=nova_alergia_nome, tipo=nova_alergia_tipo)
-                alergia.save()
-                paciente.alergias.add(alergia)
-            # Adicionando novo diagnóstico
-            novo_diagnostico_nome = form.cleaned_data.get('novo_diagnostico_nome')
-            novo_diagnostico_codigo_cid = form.cleaned_data.get('novo_diagnostico_codigo_cid')
-            if novo_diagnostico_nome:
-                diagnostico = Diagnostico(nome=novo_diagnostico_nome, codigo_cid=novo_diagnostico_codigo_cid)
-                diagnostico.save()
-                paciente.diagnosticos.add(diagnostico)
+
+            # Atualizar medicações
+            paciente.medicacoes.clear()
+            medicacao_nomes = request.POST.getlist('medicacoes_nomes[]')
+            medicacao_dosagens = request.POST.getlist('medicacoes_dosagens[]')
+            medicacao_posologias = request.POST.getlist('medicacoes_posologias[]')
+            for nome, dosagem, posologia in zip(medicacao_nomes, medicacao_dosagens, medicacao_posologias):
+                if nome and dosagem and posologia:
+                    medicacao = Medicacao.objects.create(nome=nome, dosagem=dosagem, posologia=posologia)
+                    paciente.medicacoes.add(medicacao)
+
+            # Atualizar alergias
+            paciente.alergias.clear()
+            alergia_nomes = request.POST.getlist('alergias_nomes[]')
+            for nome in alergia_nomes:
+                if nome:
+                    alergia = Alergia.objects.create(nome=nome)
+                    paciente.alergias.add(alergia)
+
+            # Atualizar diagnósticos
+            paciente.diagnosticos.clear()
+            diagnostico_nomes = request.POST.getlist('diagnosticos_nomes[]')
+            diagnostico_codigos_cid = request.POST.getlist('diagnosticos_codigos_cid[]')
+            for nome, codigo_cid in zip(diagnostico_nomes, diagnostico_codigos_cid):
+                if nome and codigo_cid:
+                    diagnostico = Diagnostico.objects.create(nome=nome, codigo_cid=codigo_cid)
+                    paciente.diagnosticos.add(diagnostico)
+
+            return redirect('liriodosvales:listar_pacientes')
     else:
         form = PacienteForm(instance=paciente)
-    context = {
-        'paciente': paciente,
-        'form': form,
-    }
-    return render(request, 'liriodosvales/editar_paciente.html', context)
 
+    # Preparar dados para exibir no template
+    medicacoes = [(med.nome, med.dosagem, med.posologia) for med in paciente.medicacoes.all()]
+    alergias = [alergia.nome for alergia in paciente.alergias.all()]
+    diagnosticos = [(diag.nome, diag.codigo_cid) for diag in paciente.diagnosticos.all()]
+
+    return render(request, 'liriodosvales/editar_paciente.html', {
+        'form': form,
+        'medicacoes': medicacoes,
+        'alergias': alergias,
+        'diagnosticos': diagnosticos
+    })
+
+def remover_paciente(request, paciente_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    paciente.delete()
+    return redirect('liriodosvales:listar_pacientes')
+
+def detalhes_paciente(request, paciente_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    medicacoes = paciente.medicacoes.all()
+    alergias = paciente.alergias.all()
+    diagnosticos = paciente.diagnosticos.all()
+
+    return render(request, 'liriodosvales/detalhes_paciente.html', {
+        'paciente': paciente,
+        'medicacoes': medicacoes,
+        'alergias': alergias,
+        'diagnosticos': diagnosticos
+    })

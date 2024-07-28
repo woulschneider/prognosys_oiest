@@ -26,7 +26,9 @@ SECRET_KEY = 'django-insecure-1kxz8%!w*wvizj5okglc7r+u9fv)n#oi(6eip7!0fi$8wc@zi+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['supernova26.com.br', 'www.supernova26.com.br',]
+ALLOWED_HOSTS = ['supernova26.com.br', 
+                 'www.supernova26.com.br',
+                 '127.0.0.1',]
 
 
 # Application definition

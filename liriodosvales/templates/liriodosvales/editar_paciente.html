@@ -52,12 +52,12 @@
 </script>
 {% endblock extra_js %}
 {% block title %}
-    Lírio dos Vales - Novo Paciente
+    Lírio dos Vales - Editar Paciente
 {% endblock title %}
 {% block content %}
     <main>
         <section>
-            <h1>Cadastrar Novo Paciente</h1>
+            <h1>Editar Paciente</h1>
             <form method="post">
                 {% csrf_token %}
                 {{ form.as_p }}
@@ -104,7 +104,7 @@
                 <input type="text" id="novo_diagnostico_codigo_cid" placeholder="Código CID">
                 <button type="button" onclick="adicionarItem('diagnosticos')">Adicionar Diagnóstico</button>
                 
-                <button type="submit">Cadastrar</button>
+                <button type="submit">Salvar</button>
             </form>
             <a href="{% url 'liriodosvales:listar_pacientes' %}">Voltar para lista de pacientes</a>
         </section>
