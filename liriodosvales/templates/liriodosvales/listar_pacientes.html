@@ -1,45 +1,41 @@
 {% extends "layout.html" %}
 {% load static %}
-{% block extra_css %}
-<link rel="stylesheet" type="text/css" href="{% static 'liriodosvales/css/style.css' %}">
-{% endblock extra_css %}
+
 {% block title %}
     Lírio dos Vales - Lista de Pacientes
 {% endblock title %}
 {% block content %}
-<main>
-    <section>
-        <h1>Lista de Pacientes</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>CPF</th>
-                    <th>Data de Nascimento</th>
-                    <th>Endereço</th>
-                    <th>Telefone</th>
-                    <th>Sexo</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for paciente in pacientes %}
-                <tr>
-                    <td><a href="{% url 'liriodosvales:detalhes_paciente' paciente.id %}">{{ paciente.nome }}</a></td>
-                    <td>{{ paciente.cpf }}</td>
-                    <td>{{ paciente.data_nascimento|date:"d/m/Y" }}</td>
-                    <td>{{ paciente.endereco }}</td>
-                    <td>{{ paciente.telefone }}</td>
-                    <td>{{ paciente.sexo }}</td>
-                    <td>
-                        <a href="{% url 'liriodosvales:editar_paciente' paciente.id %}">Editar</a> |
-                        <a href="{% url 'liriodosvales:remover_paciente' paciente.id %}" onclick="return confirm('Tem certeza que deseja remover este paciente?');">Remover</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <a href="{% url 'liriodosvales:novo_paciente' %}">Adicionar Novo Paciente</a>
-    </section>
-</main>
+<div class="container mt-5">
+    <h1>Lista de Pacientes</h1>
+    <table class="table table-bordered table-striped">
+        <thead class="thead-light">
+            <tr>
+                <th>Nome</th>
+                <th>CPF</th>
+                <th>Data de Nascimento</th>
+                <th>Endereço</th>
+                <th>Telefone</th>
+                <th>Sexo</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for paciente in pacientes %}
+            <tr>
+                <td><a href="{% url 'liriodosvales:detalhes_paciente' paciente.id %}">{{ paciente.nome }}</a></td>
+                <td>{{ paciente.cpf }}</td>
+                <td>{{ paciente.data_nascimento|date:"d/m/Y" }}</td>
+                <td>{{ paciente.endereco }}</td>
+                <td>{{ paciente.telefone }}</td>
+                <td>{{ paciente.sexo }}</td>
+                <td>
+                    <a href="{% url 'liriodosvales:editar_paciente' paciente.id %}" class="btn btn-warning btn-sm">Editar</a>
+                    <a href="{% url 'liriodosvales:remover_paciente' paciente.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja remover este paciente?');">Remover</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'liriodosvales:novo_paciente' %}" class="btn btn-primary">Adicionar Novo Paciente</a>
+</div>
 {% endblock content %}

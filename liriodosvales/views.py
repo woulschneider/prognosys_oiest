@@ -1,6 +1,7 @@
 from django.shortcuts import redirect, render
 from .models import Paciente
 from .forms import PacienteForm
+from django.contrib import messages
 
 def home(request):
     return render(request, 'liriodosvales/home.html') 
@@ -51,7 +52,8 @@ def novo_paciente(request):
                     diagnostico.save()
                     paciente.diagnosticos.add(diagnostico)
 
-            return redirect('liriodosvales:editar_paciente', paciente_id=paciente.id)
+            messages.success(request, 'Paciente cadastrado com sucesso!')
+            return redirect('liriodosvales:listar_pacientes')
         else:
             # Preservar os dados inseridos nas listas
             medicacoes = zip(request.POST.getlist('medicacoes_nomes[]'), 
@@ -139,3 +141,4 @@ def detalhes_paciente(request, paciente_id):
         'alergias': alergias,
         'diagnosticos': diagnosticos
     })
+

@@ -1,71 +1,88 @@
 {% extends "layout.html" %}
 {% load static %}
-{% block extra_css %}
-<link rel="stylesheet" type="text/css" href="{% static 'liriodosvales/css/style.css' %}">
-{% endblock extra_css %}
+{% load widget_tweaks %}
+
 {% block extra_js %}
 <script>
-    window.adicionarItem = function(tipo) {
-        let nome, dosagem, posologia, codigo_cid;
-
-        if (tipo === 'medicacoes') {
-            nome = document.getElementById('nova_medicacao_nome').value;
-            dosagem = document.getElementById('nova_medicacao_dosagem').value;
-            posologia = document.getElementById('nova_medicacao_posologia').value;
-        } else if (tipo === 'alergias') {
-            nome = document.getElementById('nova_alergia_nome').value;
-        } else if (tipo === 'diagnosticos') {
-            nome = document.getElementById('novo_diagnostico_nome').value;
-            codigo_cid = document.getElementById('novo_diagnostico_codigo_cid').value;
+    document.addEventListener('DOMContentLoaded', function() {
+        function adicionarItem(listId, inputs, buttonId) {
+            const button = document.getElementById(buttonId);
+            const list = document.getElementById(listId);
+            
+            button.addEventListener('click', function() {
+                const valores = inputs.map(id => document.getElementById(id).value.trim());
+                if (valores.some(v => v === '')) {
+                    alert('Por favor, preencha todos os campos.');
+                    return;
+                }
+                
+                const item = document.createElement('div');
+                item.className = 'list-group-item';
+                item.innerHTML = valores.map((valor, index) => 
+                    `<input type="hidden" name="${listId}_${inputs[index].split('_').pop()}[]" value="${valor}">`
+                ).join('') + valores.join(' - ');
+                
+                list.appendChild(item);
+                
+                inputs.forEach(id => document.getElementById(id).value = '');
+            });
         }
 
-        if (nome) {
-            let list = document.getElementById(`${tipo}-list`);
-            let item = document.createElement('div');
-            if (tipo === 'medicacoes') {
-                item.innerHTML = `<input type="hidden" name="medicacoes_nomes[]" value="${nome}">
-                                  <input type="hidden" name="medicacoes_dosagens[]" value="${dosagem}">
-                                  <input type="hidden" name="medicacoes_posologias[]" value="${posologia}">
-                                  ${nome} - ${dosagem} - ${posologia}`;
-            } else if (tipo === 'alergias') {
-                item.innerHTML = `<input type="hidden" name="alergias_nomes[]" value="${nome}">
-                                  ${nome}`;
-            } else if (tipo === 'diagnosticos') {
-                item.innerHTML = `<input type="hidden" name="diagnosticos_nomes[]" value="${nome}">
-                                  <input type="hidden" name="diagnosticos_codigos_cid[]" value="${codigo_cid}">
-                                  ${nome} - ${codigo_cid}`;
-            }
-            list.appendChild(item);
-
-            if (tipo === 'medicacoes') {
-                document.getElementById('nova_medicacao_nome').value = '';
-                document.getElementById('nova_medicacao_dosagem').value = '';
-                document.getElementById('nova_medicacao_posologia').value = '';
-            } else if (tipo === 'alergias') {
-                document.getElementById('nova_alergia_nome').value = '';
-            } else if (tipo === 'diagnosticos') {
-                document.getElementById('novo_diagnostico_nome').value = '';
-                document.getElementById('novo_diagnostico_codigo_cid').value = '';
-            }
-        }
-    }
+        adicionarItem('medicacoes-list', ['nova_medicacao_nome', 'nova_medicacao_dosagem', 'nova_medicacao_posologia'], 'adicionar-medicacao');
+        adicionarItem('alergias-list', ['nova_alergia_nome'], 'adicionar-alergia');
+        adicionarItem('diagnosticos-list', ['novo_diagnostico_nome', 'novo_diagnostico_codigo_cid'], 'adicionar-diagnostico');
+    });
 </script>
 {% endblock extra_js %}
+
 {% block title %}
     Lírio dos Vales - Novo Paciente
 {% endblock title %}
+
 {% block content %}
-    <main>
-        <section>
-            <h1>Cadastrar Novo Paciente</h1>
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                
-                <h3>Medicações</h3>
-                <div id="medicacoes-list" class="item-list">
+<div class="container mt-4">
+    <h1 class="mb-4">Cadastrar Novo Paciente</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="id_nome" class="form-label">Nome:</label>
+                {{ form.nome|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6">
+                <label for="id_cpf" class="form-label">CPF:</label>
+                {{ form.cpf|add_class:"form-control" }}
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label for="id_data_nascimento" class="form-label">Data de Nascimento:</label>
+                {{ form.data_nascimento|add_class:"form-control" }}
+            </div>
+            <div class="col-md-4">
+                <label for="id_telefone" class="form-label">Telefone:</label>
+                {{ form.telefone|add_class:"form-control" }}
+            </div>
+            <div class="col-md-4">
+                <label for="id_sexo" class="form-label">Sexo:</label>
+                {{ form.sexo|add_class:"form-select" }}
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col-12">
+                <label for="id_endereco" class="form-label">Endereço:</label>
+                {{ form.endereco|add_class:"form-control" }}
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">Medicações</h3>
+            </div>
+            <div class="card-body">
+                <div id="medicacoes-list" class="list-group mb-3">
                     {% for nome, dosagem, posologia in medicacoes %}
-                        <div>
+                        <div class="list-group-item">
                             <input type="hidden" name="medicacoes_nomes[]" value="{{ nome }}">
                             <input type="hidden" name="medicacoes_dosagens[]" value="{{ dosagem }}">
                             <input type="hidden" name="medicacoes_posologias[]" value="{{ posologia }}">
@@ -73,40 +90,77 @@
                         </div>
                     {% endfor %}
                 </div>
-                <input type="text" id="nova_medicacao_nome" placeholder="Nome da Medicação">
-                <input type="text" id="nova_medicacao_dosagem" placeholder="Dosagem">
-                <input type="text" id="nova_medicacao_posologia" placeholder="Posologia">
-                <button type="button" onclick="adicionarItem('medicacoes')">Adicionar Medicação</button>
-                
-                <h3>Alergias</h3>
-                <div id="alergias-list" class="item-list">
+                <div class="row">
+                    <div class="col-md-4 mb-2">
+                        <input type="text" id="nova_medicacao_nome" class="form-control" placeholder="Nome da Medicação">
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <input type="text" id="nova_medicacao_dosagem" class="form-control" placeholder="Dosagem">
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <input type="text" id="nova_medicacao_posologia" class="form-control" placeholder="Posologia">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" id="adicionar-medicacao" class="btn btn-primary">Adicionar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">Alergias</h3>
+            </div>
+            <div class="card-body">
+                <div id="alergias-list" class="list-group mb-3">
                     {% for nome in alergias %}
-                        <div>
+                        <div class="list-group-item">
                             <input type="hidden" name="alergias_nomes[]" value="{{ nome }}">
                             {{ nome }}
                         </div>
                     {% endfor %}
                 </div>
-                <input type="text" id="nova_alergia_nome" placeholder="Nome da Alergia">
-                <button type="button" onclick="adicionarItem('alergias')">Adicionar Alergia</button>
-                
-                <h3>Diagnósticos</h3>
-                <div id="diagnosticos-list" class="item-list">
+                <div class="row">
+                    <div class="col-md-10 mb-2">
+                        <input type="text" id="nova_alergia_nome" class="form-control" placeholder="Nome da Alergia">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" id="adicionar-alergia" class="btn btn-primary">Adicionar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">Diagnósticos</h3>
+            </div>
+            <div class="card-body">
+                <div id="diagnosticos-list" class="list-group mb-3">
                     {% for nome, codigo_cid in diagnosticos %}
-                        <div>
+                        <div class="list-group-item">
                             <input type="hidden" name="diagnosticos_nomes[]" value="{{ nome }}">
                             <input type="hidden" name="diagnosticos_codigos_cid[]" value="{{ codigo_cid }}">
                             {{ nome }} - {{ codigo_cid }}
                         </div>
                     {% endfor %}
                 </div>
-                <input type="text" id="novo_diagnostico_nome" placeholder="Nome do Diagnóstico">
-                <input type="text" id="novo_diagnostico_codigo_cid" placeholder="Código CID">
-                <button type="button" onclick="adicionarItem('diagnosticos')">Adicionar Diagnóstico</button>
-                
-                <button type="submit">Cadastrar</button>
-            </form>
-            <a href="{% url 'liriodosvales:listar_pacientes' %}">Voltar para lista de pacientes</a>
-        </section>
-    </main>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <input type="text" id="novo_diagnostico_nome" class="form-control" placeholder="Nome do Diagnóstico">
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <input type="text" id="novo_diagnostico_codigo_cid" class="form-control" placeholder="Código CID">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" id="adicionar-diagnostico" class="btn btn-primary">Adicionar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn btn-success btn-lg">Cadastrar</button>
+    </form>
+    <a href="{% url 'liriodosvales:listar_pacientes' %}" class="btn btn-secondary btn-lg mt-3">Voltar para lista de pacientes</a>
+</div>
 {% endblock content %}
