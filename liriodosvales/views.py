@@ -55,6 +55,9 @@ def novo_paciente(request):
             messages.success(request, 'Paciente cadastrado com sucesso!')
             return redirect('liriodosvales:listar_pacientes')
         else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"Erro no campo {field}: {error}")
             # Preservar os dados inseridos nas listas
             medicacoes = zip(request.POST.getlist('medicacoes_nomes[]'), 
                              request.POST.getlist('medicacoes_dosagens[]'), 
@@ -141,4 +144,3 @@ def detalhes_paciente(request, paciente_id):
         'alergias': alergias,
         'diagnosticos': diagnosticos
     })
-

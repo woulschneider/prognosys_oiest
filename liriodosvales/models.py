@@ -28,10 +28,10 @@ class Paciente(models.Model):
         ('Feminino', 'Feminino'),
     ]
     nome = models.CharField(max_length=100)
-    cpf  = models.CharField(max_length=11)
+    cpf = models.CharField(max_length=11, unique=True, null=True)
     data_nascimento = models.DateField()
-    endereco = models.CharField(max_length=100)
-    telefone = models.CharField(max_length=11)
+    endereco = models.CharField(max_length=100, blank=True, null=True)
+    telefone = models.CharField(max_length=11, blank=True, null=True)
     sexo = models.CharField(max_length=10, choices=SEXO_CHOICES, default='Masculino')
     medicacoes = models.ManyToManyField(Medicacao, blank=True)
     alergias = models.ManyToManyField(Alergia, blank=True)
