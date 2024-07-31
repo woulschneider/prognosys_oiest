@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block title %}Confirmação de Atendimento{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Atendimento Salvo com Sucesso</h1>
+    <p>O atendimento para {{ atendimento.paciente.nome }} foi salvo com sucesso.</p>
+    <p>Deseja imprimir o atendimento?</p>
+    <button id="btnImprimir" class="btn btn-primary">Imprimir Atendimento</button>
+    <a href="{% url 'liriodosvales:detalhes_paciente' atendimento.paciente.id %}" class="btn btn-secondary">Voltar para Detalhes do Paciente</a>
+</div>
+
+<script>
+document.getElementById('btnImprimir').addEventListener('click', function() {
+    var printWindow = window.open("{% url 'liriodosvales:imprimir_atendimento' atendimento.id %}", "_blank");
+    printWindow.onload = function() {
+        printWindow.print();
+    };
+});
+</script>
+{% endblock %}

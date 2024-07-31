@@ -31,6 +31,7 @@
                 <td>
                     <a href="{% url 'liriodosvales:editar_paciente' paciente.id %}" class="btn btn-warning btn-sm">Editar</a>
                     <a href="{% url 'liriodosvales:remover_paciente' paciente.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja remover este paciente?');">Remover</a>
+                    <a href="{% url 'liriodosvales:atendimento_medico' paciente.id %}" class="btn btn-primary btn-sm">Atendimento Médico</a>
                 </td>
             </tr>
             {% endfor %}

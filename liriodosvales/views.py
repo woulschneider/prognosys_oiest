@@ -1,7 +1,11 @@
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from .models import Paciente
 from .forms import PacienteForm
 from django.contrib import messages
+from .models import Paciente, AtendimentoMedico
+from .forms import AtendimentoMedicoForm
+from django.template.loader import render_to_string
 
 def home(request):
     return render(request, 'liriodosvales/home.html') 
@@ -144,3 +148,81 @@ def detalhes_paciente(request, paciente_id):
         'alergias': alergias,
         'diagnosticos': diagnosticos
     })
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
+from django.http import JsonResponse
+from .models import Paciente, AtendimentoMedico, Diagnostico
+from .forms import AtendimentoMedicoForm
+import json
+
+def atendimento_medico(request, paciente_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    atendimentos_anteriores = paciente.atendimentos.order_by('-data_atendimento')
+    is_primeiro_atendimento = not atendimentos_anteriores.exists()
+    
+    if request.method == 'POST':
+        form = AtendimentoMedicoForm(request.POST, is_primeiro_atendimento=is_primeiro_atendimento)
+        if form.is_valid():
+            atendimento = form.save(commit=False)
+            atendimento.paciente = paciente
+            atendimento.save()
+            return redirect(reverse('liriodosvales:imprimir_atendimento', kwargs={'atendimento_id': atendimento.id}))
+    else:
+        form = AtendimentoMedicoForm(is_primeiro_atendimento=is_primeiro_atendimento)
+    
+    tipo_atendimento = "Primeiro Atendimento" if is_primeiro_atendimento else "Reavaliação"
+    medicacoes = paciente.medicacoes.all()
+    
+    diagnosticos = list(Diagnostico.objects.values('nome', 'codigo_cid'))
+    
+    context = {
+        'paciente': paciente,
+        'form': form,
+        'medicacoes': medicacoes,
+        'tipo_atendimento': tipo_atendimento,
+        'atendimentos_anteriores': atendimentos_anteriores,
+        'is_primeiro_atendimento': is_primeiro_atendimento,
+        'diagnosticos_json': json.dumps(diagnosticos),
+    }
+    
+    return render(request, 'liriodosvales/atendimento_medico.html', context)
+
+def buscar_cid(request):
+    termo = request.GET.get('termo', '')
+    diagnosticos = Diagnostico.objects.filter(nome__icontains=termo)[:10]
+    resultados = [{'nome': d.nome, 'codigo_cid': d.codigo_cid} for d in diagnosticos]
+    return JsonResponse(resultados, safe=False)
+
+def atendimento_detalhes(request, atendimento_id):
+    atendimento = get_object_or_404(AtendimentoMedico, id=atendimento_id)
+    data = {
+        'data': atendimento.data_atendimento.strftime('%d/%m/%Y %H:%M'),
+        'tipo': atendimento.tipo_atendimento,
+        'anamnese': atendimento.anamnese,
+        'historia_patologica_pregressa': atendimento.historia_patologica_pregressa,
+        'historia_familiar': atendimento.historia_familiar,
+        'evolucao': atendimento.evolucao,
+        'hipotese_diagnostica': atendimento.hipotese_diagnostica,
+        'conduta': atendimento.conduta,
+    }
+    return JsonResponse(data)
+
+def confirmacao_atendimento(request, atendimento_id):
+    atendimento = get_object_or_404(AtendimentoMedico, id=atendimento_id)
+    return render(request, 'liriodosvales/confirmacao_atendimento.html', {'atendimento': atendimento})
+
+from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+from .models import AtendimentoMedico
+
+def imprimir_atendimento(request, atendimento_id):
+    atendimento = get_object_or_404(AtendimentoMedico, id=atendimento_id)
+    html_string = render_to_string('liriodosvales/imprimir_atendimento.html', {'atendimento': atendimento})
+    
+    response = HttpResponse(html_string)
+    response['Content-Type'] = 'text/html'
+    response['Content-Disposition'] = 'inline; filename="atendimento.html"'
+    
+    return response

@@ -41,3 +41,23 @@ class Paciente(models.Model):
     def __str__(self):
         return self.nome
     
+class AtendimentoMedico(models.Model):
+    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, related_name='atendimentos')
+    data_atendimento = models.DateTimeField(auto_now_add=True)
+    anamnese = models.TextField(blank=True, null=True)
+    historia_doenca_atual = models.TextField(blank=True, null=True)
+    historia_patologica_pregressa = models.TextField(blank=True, null=True)
+    historia_familiar = models.TextField(blank=True, null=True)
+    evolucao = models.TextField(blank=True, null=True)
+    hipotese_diagnostica_nome = models.CharField(max_length=255)
+    hipotese_diagnostica_cid = models.CharField(max_length=10)
+    conduta = models.TextField()
+
+    def __str__(self):
+        return f"Atendimento de {self.paciente.nome} em {self.data_atendimento}"
+
+    @property
+    def tipo_atendimento(self):
+        if self.paciente.atendimentos.count() == 1:
+            return "Primeiro Atendimento"
+        return "Reavaliação"

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atendimento Médico - {{ atendimento.paciente.nome }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        @media print {
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Atendimento Médico - {{ atendimento.paciente.nome }}</h1>
+    <p>Data: {{ atendimento.data_atendimento }}</p>
+    
+    <h2>Anamnese</h2>
+    <h3>História da Doença Atual</h3>
+    <p>{{ atendimento.historia_doenca_atual }}</p>
+    
+    <h3>História Patológica Pregressa</h3>
+    <p>{{ atendimento.historia_patologica_pregressa }}</p>
+    
+    <h3>História Familiar</h3>
+    <p>{{ atendimento.historia_familiar }}</p>
+    
+    <h2>Hipótese Diagnóstica</h2>
+    <p>{{ atendimento.hipotese_diagnostica }}</p>
+    
+    <h2>Conduta</h2>
+    {% for instrucao in atendimento.instrucoes.all %}
+        <h3>{{ instrucao.get_tipo_display }}</h3>
+        <p>{{ instrucao.descricao }}</p>
+        {% if instrucao.tipo == 'PRESCRICAO' %}
+            <p>Medicamento: {{ instrucao.medicamento }}</p>
+            <p>Dosagem: {{ instrucao.dosagem }}</p>
+            <p>Posologia: {{ instrucao.posologia }}</p>
+        {% elif instrucao.tipo == 'EXAME' %}
+            <p>Exame: {{ instrucao.nome_exame }}</p>
+        {% elif instrucao.tipo == 'ENCAMINHAMENTO' %}
+            <p>Especialidade: {{ instrucao.especialidade }}</p>
+            <p>Serviço: {{ instrucao.servico }}</p>
+        {% endif %}
+    {% endfor %}
+
+    <button class="no-print" onclick="window.print()">Imprimir</button>
+    
+    <script>
+        window.onload = function() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

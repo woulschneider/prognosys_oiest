@@ -1,0 +1,221 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}
+    Lírio dos Vales - Atendimento Médico
+{% endblock title %}
+
+{% block extra_css %}
+<style>
+    .card-level-2 {
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+    }
+    .card-level-2 > .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+    .card-level-3 {
+        border: 1px dashed #ced4da;
+        border-radius: 0.25rem;
+        margin-bottom: 1rem;
+    }
+    .card-level-3 > .card-header {
+        background-color: #ffffff;
+        border-bottom: 1px dashed #ced4da;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Atendimento Médico - {{ paciente.nome }}</h1>
+    <h2 class="mb-3">Tipo de Atendimento: {{ tipo_atendimento }}</h2>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="h5 mb-0">Medicações em Uso</h2>
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+            {% for medicacao in medicacoes %}
+                <li class="list-group-item">{{ medicacao.nome }} - {{ medicacao.dosagem }} - {{ medicacao.posologia }}</li>
+            {% empty %}
+                <li class="list-group-item">Nenhuma medicação registrada.</li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        {% if is_primeiro_atendimento %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4 class="h5 mb-0">Primeiro Atendimento</h4>
+                </div>
+                <div class="card-body">
+                    <div class="card card-level-2">
+                        <div class="card-header">
+                            <h5 class="h6 mb-0">Anamnese</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="card card-level-3">
+                                <div class="card-header">
+                                    <h6 class="h6 mb-0">História da Doença Atual</h6>
+                                </div>
+                                <div class="card-body">
+                                    {{ form.historia_doenca_atual }}
+                                </div>
+                            </div>
+                            <div class="card card-level-3">
+                                <div class="card-header">
+                                    <h6 class="h6 mb-0">História Patológica Pregressa</h6>
+                                </div>
+                                <div class="card-body">
+                                    {{ form.historia_patologica_pregressa }}
+                                </div>
+                            </div>
+                            <div class="card card-level-3">
+                                <div class="card-header">
+                                    <h6 class="h6 mb-0">História Familiar</h6>
+                                </div>
+                                <div class="card-body">
+                                    {{ form.historia_familiar }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card card-level-2">
+                        <div class="card-header">
+                            <h5 class="h6 mb-0">Hipótese Diagnóstica</h5>
+                        </div>
+                        <div class="card-body">
+                            {{ form.hipotese_diagnostica }}
+                        </div>
+                    </div>
+                    
+                    <div class="card card-level-2">
+                        <div class="card-header">
+                            <h5 class="h6 mb-0">Conduta</h5>
+                        </div>
+                        <div class="card-body">
+                            {{ form.conduta }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h4 class="h5 mb-0">Reavaliação</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="{{ form.evolucao.id_for_label }}" class="form-label">Evolução</label>
+                        {{ form.evolucao }}
+                    </div>
+                    
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h5 class="h6 mb-0">Hipótese Diagnóstica</h5>
+                        </div>
+                        <div class="card-body">
+                            {{ form.hipotese_diagnostica }}
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h5 class="h6 mb-0">Conduta</h5>
+                        </div>
+                        <div class="card-body">
+                            {{ form.conduta }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <button type="submit" class="btn btn-primary">Salvar Atendimento</button>
+    </form>
+</div>
+
+<!-- Modal para exibir detalhes do atendimento -->
+<div class="modal fade" id="atendimentoModal" tabindex="-1" aria-labelledby="atendimentoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="atendimentoModalLabel">Detalhes do Atendimento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="atendimentoModalBody">
+                <!-- Conteúdo será preenchido via JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const atendimentoLinks = document.querySelectorAll('.atendimento-link');
+        const modal = new bootstrap.Modal(document.getElementById('atendimentoModal'));
+        
+        atendimentoLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const atendimentoId = this.dataset.id;
+                fetch(`/atendimento-detalhes/${atendimentoId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const modalBody = document.getElementById('atendimentoModalBody');
+                        modalBody.innerHTML = `
+                            <p><strong>Data:</strong> ${data.data}</p>
+                            <p><strong>Tipo:</strong> ${data.tipo}</p>
+                            <p><strong>Anamnese:</strong> ${data.anamnese || 'N/A'}</p>
+                            <p><strong>História Patológica Pregressa:</strong> ${data.historia_patologica_pregressa || 'N/A'}</p>
+                            <p><strong>História Familiar:</strong> ${data.historia_familiar || 'N/A'}</p>
+                            <p><strong>Evolução:</strong> ${data.evolucao || 'N/A'}</p>
+                            <p><strong>Hipótese Diagnóstica:</strong> ${data.hipotese_diagnostica}</p>
+                            <p><strong>Conduta:</strong> ${data.conduta}</p>
+                        `;
+                        modal.show();
+                    });
+            });
+        });
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/autoComplete.min.js"></script>
+<script>
+    const diagnosticos = {{ diagnosticos_json|safe }};
+
+    new autoComplete({
+        selector: "#hipotese_diagnostica_input",
+        data: {
+            src: diagnosticos,
+            keys: ["nome"]
+        },
+        resultItem: {
+            highlight: true
+        },
+        events: {
+            input: {
+                selection: (event) => {
+                    const selection = event.detail.selection.value;
+                    event.target.value = `${selection.nome} [${selection.codigo_cid}]`;
+                }
+            }
+        },
+        resultsList: {
+            maxResults: 10
+        },
+        threshold: 2,
+        searchEngine: "strict"
+    });
+</script>
+{% endblock %}
