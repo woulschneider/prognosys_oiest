@@ -6,7 +6,7 @@ app_name = 'liriodosvales'
 urlpatterns = [
     # ... outras URLs ...
     path('buscar-cid/', views.buscar_cid, name='buscar_cid'),
-    # ... outras URLs ...
+    path('aplicar-mudancas-medicacao/', views.aplicar_mudancas_medicacao, name='aplicar_mudancas_medicacao'),
     path('confirmacao-atendimento/<int:atendimento_id>/', views.confirmacao_atendimento, name='confirmacao_atendimento'),
     path('imprimir-atendimento/<int:atendimento_id>/', views.imprimir_atendimento, name='imprimir_atendimento'),
     path('', views.home, name='home'),
@@ -17,4 +17,5 @@ urlpatterns = [
     path('detalhes_paciente/<int:paciente_id>/', views.detalhes_paciente, name='detalhes_paciente'),
     path('atendimento_medico/<int:paciente_id>/', views.atendimento_medico, name='atendimento_medico'),
     path('atendimento-detalhes/<int:atendimento_id>/', views.atendimento_detalhes, name='atendimento_detalhes'),
+    path('registrar-conduta/<int:atendimento_id>/', views.registrar_conduta, name='registrar_conduta'),
 ]

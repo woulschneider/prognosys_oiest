@@ -1,9 +1,11 @@
 from django.db import models
 
+
 class Medicacao(models.Model):
     nome = models.CharField(max_length=100)
-    dosagem = models.CharField(max_length=100)
-    posologia = models.TextField() 
+    dosagem = models.CharField(max_length=50)
+    posologia = models.CharField(max_length=100)
+    atendimento = models.ForeignKey('AtendimentoMedico', on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.nome} - {self.dosagem} - {self.posologia}"
@@ -44,14 +46,12 @@ class Paciente(models.Model):
 class AtendimentoMedico(models.Model):
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, related_name='atendimentos')
     data_atendimento = models.DateTimeField(auto_now_add=True)
-    anamnese = models.TextField(blank=True, null=True)
     historia_doenca_atual = models.TextField(blank=True, null=True)
     historia_patologica_pregressa = models.TextField(blank=True, null=True)
     historia_familiar = models.TextField(blank=True, null=True)
     evolucao = models.TextField(blank=True, null=True)
-    hipotese_diagnostica_nome = models.CharField(max_length=255)
-    hipotese_diagnostica_cid = models.CharField(max_length=10)
-    conduta = models.TextField()
+    hipotese_diagnostica = models.TextField(blank=True, null=True)
+    conduta = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"Atendimento de {self.paciente.nome} em {self.data_atendimento}"
@@ -61,3 +61,11 @@ class AtendimentoMedico(models.Model):
         if self.paciente.atendimentos.count() == 1:
             return "Primeiro Atendimento"
         return "Reavaliação"
+
+class ExameComplementar(models.Model):
+    nome = models.CharField(max_length=200)
+    atendimento = models.ForeignKey('AtendimentoMedico', on_delete=models.CASCADE)
+
+class Encaminhamento(models.Model):
+    especialidade = models.CharField(max_length=100)
+    atendimento = models.ForeignKey('AtendimentoMedico', on_delete=models.CASCADE)

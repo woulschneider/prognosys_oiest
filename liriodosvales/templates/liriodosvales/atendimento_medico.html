@@ -30,6 +30,7 @@
 {% endblock %}
 
 {% block content %}
+<div id="flash-messages" class="container mt-3"></div>
 <div class="container mt-4">
     <h1 class="mb-4">Atendimento Médico - {{ paciente.nome }}</h1>
     <h2 class="mb-3">Tipo de Atendimento: {{ tipo_atendimento }}</h2>
@@ -39,7 +40,7 @@
             <h2 class="h5 mb-0">Medicações em Uso</h2>
         </div>
         <div class="card-body">
-            <ul class="list-group list-group-flush">
+            <ul id="lista-medicacoes">
             {% for medicacao in medicacoes %}
                 <li class="list-group-item">{{ medicacao.nome }} - {{ medicacao.dosagem }} - {{ medicacao.posologia }}</li>
             {% empty %}
@@ -49,7 +50,7 @@
         </div>
     </div>
 
-    <form method="post">
+    <form method="post" id="atendimentoForm" data-paciente-id="{{ paciente.id }}" data-atendimento-id="{{ atendimento.id|default_if_none:'' }}">
         {% csrf_token %}
         {% if is_primeiro_atendimento %}
             <div class="card mb-4">
@@ -88,24 +89,6 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="card card-level-2">
-                        <div class="card-header">
-                            <h5 class="h6 mb-0">Hipótese Diagnóstica</h5>
-                        </div>
-                        <div class="card-body">
-                            {{ form.hipotese_diagnostica }}
-                        </div>
-                    </div>
-                    
-                    <div class="card card-level-2">
-                        <div class="card-header">
-                            <h5 class="h6 mb-0">Conduta</h5>
-                        </div>
-                        <div class="card-body">
-                            {{ form.conduta }}
-                        </div>
-                    </div>
                 </div>
             </div>
         {% else %}
@@ -114,31 +97,65 @@
                     <h4 class="h5 mb-0">Reavaliação</h4>
                 </div>
                 <div class="card-body">
+                    {% if ultimo_atendimento %}
+                        <p>Último atendimento: <a href="{% url 'liriodosvales:atendimento_detalhes' atendimento_id=ultimo_atendimento.id %}">{{ ultimo_atendimento.data_atendimento|date:"d/m/Y" }}</a></p>
+                    {% endif %}
                     <div class="mb-3">
                         <label for="{{ form.evolucao.id_for_label }}" class="form-label">Evolução</label>
                         {{ form.evolucao }}
                     </div>
-                    
-                    <div class="card mb-3">
-                        <div class="card-header bg-light">
-                            <h5 class="h6 mb-0">Hipótese Diagnóstica</h5>
-                        </div>
-                        <div class="card-body">
-                            {{ form.hipotese_diagnostica }}
-                        </div>
-                    </div>
-                    
-                    <div class="card mb-3">
-                        <div class="card-header bg-light">
-                            <h5 class="h6 mb-0">Conduta</h5>
-                        </div>
-                        <div class="card-body">
-                            {{ form.conduta }}
-                        </div>
-                    </div>
                 </div>
             </div>
         {% endif %}
+        <div class="card mb-3">
+            <div class="card-header bg-light">
+                <h5 class="h6 mb-0">Hipótese Diagnóstica</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <input type="text" name="hipotese_diagnostica_nome" id="hipotese_diagnostica_nome" class="form-control" placeholder="Nome do Diagnóstico">
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" name="hipotese_diagnostica_cid" id="hipotese_diagnostica_cid" class="form-control" placeholder="Código CID">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header bg-light">
+                <h5 class="h6 mb-0">Conduta</h5>
+            </div>
+            <div class="card-body">
+                <div id="condutas-list" class="list-group mb-3">
+                    <!-- As condutas adicionadas serão exibidas aqui -->
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <select id="tipo_conduta" class="form-select">
+                            <option value="prescricao">Prescrição</option>
+                            <option value="exame">Exame Complementar</option>
+                            <option value="encaminhamento">Encaminhamento</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" id="descricao_conduta" class="form-control" placeholder="Descrição da conduta">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-primary w-100" onclick="adicionarConduta()">
+                            <i class="fas fa-plus me-2"></i>Adicionar
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-success w-100" onclick="aplicarMudancasMedicacao()">
+                            <i class="fas fa-check me-2"></i>Aplicar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <button type="submit" class="btn btn-primary">Salvar Atendimento</button>
     </form>
 </div>
@@ -157,65 +174,8 @@
         </div>
     </div>
 </div>
-
 {% endblock content %}
 
 {% block extra_js %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const atendimentoLinks = document.querySelectorAll('.atendimento-link');
-        const modal = new bootstrap.Modal(document.getElementById('atendimentoModal'));
-        
-        atendimentoLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const atendimentoId = this.dataset.id;
-                fetch(`/atendimento-detalhes/${atendimentoId}/`)
-                    .then(response => response.json())
-                    .then(data => {
-                        const modalBody = document.getElementById('atendimentoModalBody');
-                        modalBody.innerHTML = `
-                            <p><strong>Data:</strong> ${data.data}</p>
-                            <p><strong>Tipo:</strong> ${data.tipo}</p>
-                            <p><strong>Anamnese:</strong> ${data.anamnese || 'N/A'}</p>
-                            <p><strong>História Patológica Pregressa:</strong> ${data.historia_patologica_pregressa || 'N/A'}</p>
-                            <p><strong>História Familiar:</strong> ${data.historia_familiar || 'N/A'}</p>
-                            <p><strong>Evolução:</strong> ${data.evolucao || 'N/A'}</p>
-                            <p><strong>Hipótese Diagnóstica:</strong> ${data.hipotese_diagnostica}</p>
-                            <p><strong>Conduta:</strong> ${data.conduta}</p>
-                        `;
-                        modal.show();
-                    });
-            });
-        });
-    });
-</script>
-<script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/autoComplete.min.js"></script>
-<script>
-    const diagnosticos = {{ diagnosticos_json|safe }};
-
-    new autoComplete({
-        selector: "#hipotese_diagnostica_input",
-        data: {
-            src: diagnosticos,
-            keys: ["nome"]
-        },
-        resultItem: {
-            highlight: true
-        },
-        events: {
-            input: {
-                selection: (event) => {
-                    const selection = event.detail.selection.value;
-                    event.target.value = `${selection.nome} [${selection.codigo_cid}]`;
-                }
-            }
-        },
-        resultsList: {
-            maxResults: 10
-        },
-        threshold: 2,
-        searchEngine: "strict"
-    });
-</script>
-{% endblock %}
+<script src="{% static 'liriodosvales/js/atendimento_medico.js' %}"></script>
+{% endblock extra_js %}
